@@ -43,7 +43,10 @@ export function parseYearlyPage(yearInt) {
             }
 
             if (o.tagName.toLowerCase() === 'ul') {
-              let ulContent = $(o.children).toArray().map((li) => {
+              let ulChildNodes = $(o.children).toArray();
+              let ulChildNodesWithoutLineBreaks = ulChildNodes.filter((node) => node.type == 'tag');
+
+              let ulContent = ulChildNodesWithoutLineBreaks.map((li) => {
                 let internalList = $(li).find("ul");
                 if (internalList.length > 0) {
                   let dateStr = $(li).find("a").first().text();
@@ -52,7 +55,8 @@ export function parseYearlyPage(yearInt) {
                     return [dateStr, $(intLi).text()];
                   });
                 } else {
-                  return $(li).text().split('—');
+                  let dateDescriptionFullText = $(li).text().trim();
+                  return dateDescriptionFullText.split('—');
                 }
               });
 
@@ -70,16 +74,6 @@ export function parseYearlyPage(yearInt) {
             return r;
           }, [])
         };
-
-        cat.monthlyEvents.forEach((el, idx) => {
-          if (idx < 12) {
-            el.date = new Date(1961, idx);
-          } else {
-            el.date = new Date(1961, 0);
-          }
-
-          return el;
-        })
 
         return cat;
       });
@@ -119,7 +113,7 @@ export function parseYearlyPage(yearInt) {
 
     })
     .catch(function (err) {
-      console.log(yearInt + 'raised error' + e.toString())
+      console.log(yearInt + 'raised error' + err.toString())
     });
 }
 
